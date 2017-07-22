@@ -89,6 +89,7 @@ function setupCompleteDungeon() {
 
 	renderer.render(stage);
 
+	setKeyboard();
 	setSprites();
 
 	gameLoop();
@@ -98,6 +99,14 @@ function setSprites() {
 	// Initialisation de la vélocité
 	explorer.vx = 0;
 	explorer.vy = 0;
+
+	explorer.accelerationX = 0;
+	explorer.accelerationY = 0;
+	explorer.frictionX = 1;
+	explorer.frictionY = 1;
+
+	explorer.speed = 0.2;
+	explorer.drag = 0.98;
 }
 
 function gameLoop() {
@@ -112,7 +121,6 @@ function gameLoop() {
 	// explorer.x += explorer.vx;
 	// explorer.y += explorer.vy;
 	
-	setKeyboard();
 
 	// Met à jour le state du jeu
 	state();
@@ -132,8 +140,20 @@ function play() {
 	// explorer.y += explorer.vy;
 	
 	// On applique la vélocité du sprite à sa position
+	// explorer.x += explorer.vx;
+	// explorer.y += explorer.vy;
+	
+	// On applique l'acceleration et la friction au sprite
+	explorer.vx += explorer.accelerationX;
+	explorer.vy += explorer.accelerationY;
+
+	explorer.vx *= explorer.frictionX;
+	explorer.vy *= explorer.frictionY;
+
+	// On applique la vélocité à la position pour le faire bouger
 	explorer.x += explorer.vx;
 	explorer.y += explorer.vy;
+
 }
 
 function setKeyboard() {
@@ -143,45 +163,70 @@ function setKeyboard() {
 	let down = keyboard(40);
 
 	left.press = () => {
-		explorer.vx = -5;
-		explorer.vy = 0;
+		// explorer.vx = -5;
+		// explorer.vy = 0;
+		explorer.accelerationX = -explorer.speed;
+		explorer.frictionX = 1;
 	};
 	left.release = () => {
 		//If the left arrow has been released, and the right arrow isn't down,
 		//and the pixie isn't moving vertically, stop the sprite from moving
 		//by setting its velocity to zero
-		if (!right.isDown && explorer.vy === 0) {
-			explorer.vx = 0;
+		// if (!right.isDown && explorer.vy === 0) {
+		// 	explorer.vx = 0;
+		// }
+		if(!right.isDown) {
+			explorer.accelerationX = 0;
+			explorer.frictionX = explorer.drag;
 		}
+
 	};
 
 	up.press = () => {
-		explorer.vy = -5;
-		explorer.vx = 0;
+		// explorer.vy = -5;
+		// explorer.vx = 0;
+		explorer.accelerationY = -explorer.speed;
+		explorer.frictionY = 1;
 	};
 	up.release = () => {
-		if(!down.isDown && explorer.vx === 0) {
-			explorer.vy = 0;
+		// if(!down.isDown && explorer.vx === 0) {
+		// 	explorer.vy = 0;
+		// }
+		if(!down.isDown) {
+			explorer.accelerationY = 0;
+			explorer.frictionY = explorer.drag;
 		}
 	};
 
 	right.press = () => {
-		explorer.vx = 5;
-		explorer.vy = 0;
+		// explorer.vx = 5;
+		// explorer.vy = 0;
+		explorer.accelerationX = explorer.speed;
+		explorer.frictionX = 1;
 	};
 	right.release = () => {
-		if(!left.isDown && explorer.vy === 0) {
-			explorer.vx = 0;
+		// if(!left.isDown && explorer.vy === 0) {
+		// 	explorer.vx = 0;
+		// }
+		if(!left.isDown) {
+			explorer.accelerationX = 0;
+			explorer.frictionX = explorer.drag;
 		}
 	};
 
 	down.press = () => {
-		explorer.vy = 5;
-		explorer.vx = 0;
+		// explorer.vy = 5;
+		// explorer.vx = 0;
+		explorer.accelerationY = explorer.speed;
+		explorer.frictionY = 1;
 	};
 	down.release = () => {
-		if(!up.isDown && explorer.vx === 0) {
-			explorer.vy = 0;
+		// if(!up.isDown && explorer.vx === 0) {
+		// 	explorer.vy = 0;
+		// }
+		if(!up.isDown) {
+			explorer.accelerationY = 0;
+			explorer.frictionY = explorer.drag;
 		}
 	};
 

@@ -1,4 +1,6 @@
-// Declaration des alias
+///////////////////////////
+// Declaration des alias //
+///////////////////////////
 let TextureCache = PIXI.utils.TextureCache;
 let autoDetectRenderer = PIXI.autoDetectRenderer;
 let loader = PIXI.loader;
@@ -7,119 +9,40 @@ let Sprite = PIXI.Sprite;
 let Rectangle = PIXI.Rectangle;
 let Texture = PIXI.Texture;
 
+////////////////////////
+// Configuration PIXI //
+////////////////////////
 PIXI.scaleModes.DEFAULT = PIXI.SCALE_MODES_NEAREST;
 
+//////////////////////////
+// Paramétrage renderer //
+//////////////////////////
 // Create a renderer
-// let renderer = autoDetectRenderer(512, 512, {
-// 	antialias: false, transparent: false, resolution: 1
-// });
 let renderer = autoDetectRenderer();
 // Create a container object called 'stage'
 let stage = new PIXI.Container();
-
-
 // Add canvas to the HTML document
 document.body.appendChild(renderer.view);
-
+document.body.style.backgroundColor = "#2C3539";
 // Style du renderer
-renderer.view.style.border = "1px dashed red";
-// renderer.backgroundColor = 0xFFFFFF;
-// renderer.view.style.position = "absolute";
-// renderer.view.style.width = window.innerWidth + "px";
-// renderer.view.style.height = window.innerHeight + "px";
-// renderer.view.style.display = "block";
-
+renderer.view.style.border = "1px dashed black";
 window.addEventListener("resize", event => {
 	scaleToWindow(renderer.view);
 })
-
 let scale = scaleToWindow(renderer.view);
 
-// Partie Texture
+
+////////////////////////////
+// Chargement  Texture // //
+////////////////////////////
 loader
-	.add(["images/explorer.png",
-		"images/blob.png",
-		"images/door.png",
-		"images/treasure.png",
-		"images/tileset.png",
-		"images/tilesetCustom.json"])
+	.add(["images/tilesetCustom.json"])
 	.on("progress", loadProgressHandler)
 	.load(setupCompleteDungeon);
 
-/*
- * Cette fonction sera appelée après que PIXI.loader ai chargé l'image
- */
-function setup() {
-	let spriteExplorer = new Sprite(TextureCache["images/explorer.png"]);
-	let spriteBlob = new Sprite(TextureCache["images/blob.png"]);
-	let spriteDoor = new Sprite(TextureCache["images/door.png"]);
-	let spriteTreasure = new Sprite(TextureCache["images/treasure.png"]);
-
-	// Set sprite position
-	spriteExplorer.x = 96;
-	spriteExplorer.y = 128;
-	spriteTreasure.anchor.x = 0.5;
-	spriteTreasure.anchor.y = 0.5;
-	spriteExplorer.rotation = 0.5;
-
-	spriteBlob.position.set(235, 52);
-	spriteBlob.width = 80;
-	spriteBlob.height = 120;
-	spriteBlob.anchor.set(0.5, 0.5);
-	spriteBlob.rotation = getRadiansFromDegrees(45);
-
-	spriteDoor.position.set(125, 200);
-	spriteDoor.scale.x = 0.5;
-	spriteDoor.scale.y = 0.5;
-	spriteDoor.pivot.set(spriteDoor.width / 2, spriteDoor.height / 2);
-	spriteDoor.rotation = getRadiansFromDegrees(90);
-
-	spriteTreasure.position.set(352, 110);
-	spriteTreasure.scale.set(2, 2);
-
-	stage.addChild(spriteExplorer);
-	stage.addChild(spriteBlob);
-	stage.addChild(spriteDoor);
-	stage.addChild(spriteTreasure);
-
-	// Make sprites disappear
-	// spriteTreasure.visible = false;
-
-	// Tell the renderer to render the stage
-	renderer.render(stage);
-}
-
-function setupWithTileset() {
-	// Creation du tileset
-	// let texture = TextureCache["images/tileset.png"];
-
-	// Le rectangle qui ciblera l'image à extraire du tileset
-	// let rectangle = new PIXI.Rectangle(160, 256, 32, 32);
-
-	// On utilise ce rectangle sur le tileset
-	// texture.frame = rectangle;
-
-	// On crée le sprite à partir du rectangle
-	// let adventuress = new Sprite(frame("images/tileset.png", 160, 256, 32, 32));
-	
-	// Utilisation d'un tileset JSON
-	let id = loader.resources["images/tilesetCustom.json"].textures;
-	let spriteExplorer = new Sprite(id["explorer.png"]);
-	
-
-	// On positionne / scale
-	// adventuress.position.set(64, 64);
-	// adventuress.scale.set(3, 3);
-	spriteExplorer.position.set(64, 64);
-	spriteExplorer.scale.set(3, 3);
-
-	// Add et render le stage
-	// stage.addChild(adventuress);
-	stage.addChild(spriteExplorer);
-	renderer.render(stage);
-}
 
 let dungeon, explorer, treasure, door;
+let state = play;
 
 function setupCompleteDungeon() {
 	// On charge les sprites dans le stage
@@ -165,8 +88,54 @@ function setupCompleteDungeon() {
 
 
 	renderer.render(stage);
+
+	setSprites();
+
+	gameLoop();
 }
 
+function setSprites() {
+	// Initialisation de la vélocité
+	explorer.vx = 0;
+	explorer.vy = 0;
+}
+
+function gameLoop() {
+	// Loop this function 60 times per second
+	requestAnimationFrame(gameLoop);
+
+	// Setting de la vélocité
+	// explorer.vx = 1;
+	// explorer.vy = 1;
+
+	// // On fait avant l'explorer de 1 vers la droite
+	// explorer.x += explorer.vx;
+	// explorer.y += explorer.vy;
+
+	// Met à jour le state du jeu
+	state();
+
+
+	// On rafraichit le stage
+	renderer.render(stage);
+}
+
+function play() {
+	// Setting de la vélocité
+	explorer.vx = 1;
+	explorer.vy = 1;
+
+	// On fait avant l'explorer de 1 vers la droite
+	explorer.x += explorer.vx;
+	explorer.y += explorer.vy;
+}
+
+
+
+
+///////////////////////////
+// Fonctions Utilitaires //
+///////////////////////////
 
 function frame(source, x, y, width, height) {
 	let texture, imageFrame;
@@ -197,7 +166,6 @@ function frame(source, x, y, width, height) {
 
 function loadProgressHandler(loader, resource) {
 	console.log("Loading: " + resource.url);
-
 	console.log("Progress: " + loader.progress);
 }
 

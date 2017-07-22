@@ -150,6 +150,9 @@ function play() {
 	explorer.vx *= explorer.frictionX;
 	explorer.vy *= explorer.frictionY;
 
+	// Gravité
+	// explorer.vy += 0.1;
+
 	// On applique la vélocité à la position pour le faire bouger
 	explorer.x += explorer.vx;
 	explorer.y += explorer.vy;

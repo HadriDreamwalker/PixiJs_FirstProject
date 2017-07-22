@@ -111,6 +111,8 @@ function gameLoop() {
 	// // On fait avant l'explorer de 1 vers la droite
 	// explorer.x += explorer.vx;
 	// explorer.y += explorer.vy;
+	
+	setKeyboard();
 
 	// Met à jour le state du jeu
 	state();
@@ -122,12 +124,68 @@ function gameLoop() {
 
 function play() {
 	// Setting de la vélocité
-	explorer.vx = 1;
-	explorer.vy = 1;
+	// explorer.vx = 1;
+	// explorer.vy = 1;
 
 	// On fait avant l'explorer de 1 vers la droite
+	// explorer.x += explorer.vx;
+	// explorer.y += explorer.vy;
+	
+	// On applique la vélocité du sprite à sa position
 	explorer.x += explorer.vx;
 	explorer.y += explorer.vy;
+}
+
+function setKeyboard() {
+	let left = keyboard(37);
+	let right = keyboard(39);
+	let up = keyboard(38);
+	let down = keyboard(40);
+
+	left.press = () => {
+		explorer.vx = -5;
+		explorer.vy = 0;
+	};
+	left.release = () => {
+		//If the left arrow has been released, and the right arrow isn't down,
+		//and the pixie isn't moving vertically, stop the sprite from moving
+		//by setting its velocity to zero
+		if (!right.isDown && explorer.vy === 0) {
+			explorer.vx = 0;
+		}
+	};
+
+	up.press = () => {
+		explorer.vy = -5;
+		explorer.vx = 0;
+	};
+	up.release = () => {
+		if(!down.isDown && explorer.vx === 0) {
+			explorer.vy = 0;
+		}
+	};
+
+	right.press = () => {
+		explorer.vx = 5;
+		explorer.vy = 0;
+	};
+	right.release = () => {
+		if(!left.isDown && explorer.vy === 0) {
+			explorer.vx = 0;
+		}
+	};
+
+	down.press = () => {
+		explorer.vy = 5;
+		explorer.vx = 0;
+	};
+	down.release = () => {
+		if(!up.isDown && explorer.vx === 0) {
+			explorer.vy = 0;
+		}
+	};
+
+
 }
 
 

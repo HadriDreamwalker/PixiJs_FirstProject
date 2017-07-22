@@ -7,10 +7,13 @@ let Sprite = PIXI.Sprite;
 let Rectangle = PIXI.Rectangle;
 let Texture = PIXI.Texture;
 
+PIXI.scaleModes.DEFAULT = PIXI.SCALE_MODES_NEAREST;
+
 // Create a renderer
-let renderer = autoDetectRenderer(512, 256, {
-	antialias: false, transparent: false, resolution: 1
-});
+// let renderer = autoDetectRenderer(512, 512, {
+// 	antialias: false, transparent: false, resolution: 1
+// });
+let renderer = autoDetectRenderer();
 // Create a container object called 'stage'
 let stage = new PIXI.Container();
 
@@ -38,9 +41,10 @@ loader
 		"images/blob.png",
 		"images/door.png",
 		"images/treasure.png",
-		"images/tileset.png"])
+		"images/tileset.png",
+		"images/tilesetCustom.json"])
 	.on("progress", loadProgressHandler)
-	.load(setupWithTileset);
+	.load(setupCompleteDungeon);
 
 /*
  * Cette fonction sera appelée après que PIXI.loader ai chargé l'image
@@ -96,16 +100,73 @@ function setupWithTileset() {
 	// texture.frame = rectangle;
 
 	// On crée le sprite à partir du rectangle
-	let adventuress = new Sprite(frame("images/tileset.png", 160, 256, 32, 32));
+	// let adventuress = new Sprite(frame("images/tileset.png", 160, 256, 32, 32));
+	
+	// Utilisation d'un tileset JSON
+	let id = loader.resources["images/tilesetCustom.json"].textures;
+	let spriteExplorer = new Sprite(id["explorer.png"]);
+	
 
 	// On positionne / scale
-	adventuress.position.set(64, 64);
-	adventuress.scale.set(3, 3);
+	// adventuress.position.set(64, 64);
+	// adventuress.scale.set(3, 3);
+	spriteExplorer.position.set(64, 64);
+	spriteExplorer.scale.set(3, 3);
 
 	// Add et render le stage
-	stage.addChild(adventuress);
+	// stage.addChild(adventuress);
+	stage.addChild(spriteExplorer);
 	renderer.render(stage);
 }
+
+let dungeon, explorer, treasure, door;
+
+function setupCompleteDungeon() {
+	// On charge les sprites dans le stage
+	let textureDungeon = TextureCache["dungeon.png"];
+	dungeon = new Sprite(textureDungeon);
+	stage.addChild(dungeon);
+
+	// On peut le faire d'une autre manière
+	let id = loader.resources["images/tilesetCustom.json"].textures;
+	explorer = new Sprite(id["explorer.png"]);
+
+	// On positionne les sprites
+	explorer.x = 68;
+	explorer.y = stage.height / 2 - explorer.height / 2;
+	stage.addChild(explorer);
+
+	// Un autre sprite a charger
+	treasure = new Sprite(id["treasure.png"]);
+	stage.addChild(treasure);
+	treasure.x = stage.width - treasure.width - 48;
+	treasure.y = stage.height / 2 - treasure.height / 2;
+
+	// Et maintenant la porte
+	door = new Sprite(id["door.png"]);
+	door.position.set(32, 0);
+	stage.addChild(door);
+
+	// On rajoute des blobs !
+	let numberOfBlobs =  6,
+		spacing = 48,
+		xOffset = 150;
+
+	for(let i = 0; i < numberOfBlobs; i++) {
+		let blob = new Sprite(id["blob.png"]);
+		let x = spacing * i + xOffset;
+		let y = randomInt(0, stage.height - blob.height);
+
+		blob.x = x;
+		blob.y = y;
+
+		stage.addChild(blob);
+	}
+
+
+	renderer.render(stage);
+}
+
 
 function frame(source, x, y, width, height) {
 	let texture, imageFrame;
@@ -140,6 +201,8 @@ function loadProgressHandler(loader, resource) {
 	console.log("Progress: " + loader.progress);
 }
 
-
+function randomInt(min, max) {
+	return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 

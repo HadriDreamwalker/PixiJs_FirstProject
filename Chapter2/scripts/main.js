@@ -150,9 +150,33 @@ function play() {
 	explorer.vx *= explorer.frictionX;
 	explorer.vy *= explorer.frictionY;
 
+	// Gravité
+	// explorer.vy += 0.1;
+
 	// On applique la vélocité à la position pour le faire bouger
 	explorer.x += explorer.vx;
 	explorer.y += explorer.vy;
+
+	// Gestion de la collision
+	let collision = contain(
+		explorer,
+		{
+			x: 0,
+			y: 0,
+			width: renderer.view.width,
+			height: renderer.view.height
+		}
+	);
+
+	if(collision) {
+		// Si je cogne sur la gauche ou la droite, j'inverse la vélocité pour 'rebondir'
+		if(collision.has("left") || collision.has("right")) {
+			explorer.vx = -explorer.vx;
+		}
+		if(collision.has("up") || collision.has("down")) {
+			explorer.vy = -explorer.vy;
+		}
+	}
 
 }
 
@@ -276,4 +300,36 @@ function randomInt(min, max) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function contain(sprite, container) {
+	// Le set contiendra les collisions 
+	var collision = new Set();
+
+	// Si le sprite dépasse les bornes du container, on le remet dedans et on note la collision
+	if(sprite.x < container.x) {
+		sprite.x = container.x;
+		collision.add("left");
+	}
+
+	if(sprite.y < container.y) {
+		sprite.y = container.y;
+		collision.add("up");
+	}
+
+	if(sprite.x + sprite.width > container.width) {
+		sprite.x = container.width - sprite.width;
+		collision.add("right");
+	}
+
+	if(sprite.y + sprite.height > container.height) {
+		sprite.y = container.height - sprite.height;
+		collision.add("down");
+	}
+
+	// Si aucune collision, on met collision à undefined
+	if(collision.size === 0) collision = undefined;
+
+	// Return de collision
+	return collision;
+
+}
 

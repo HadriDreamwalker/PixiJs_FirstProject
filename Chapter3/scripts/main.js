@@ -62,8 +62,13 @@ function setup() {
 	circle.lineStyle(4, 0x006600, 1);
 	circle.drawCircle(0, 0, 48);
 	circle.endFill();
-	circle.position.set(256, 112);
-	stage.addChild(circle);
+	// circle.position.set(256, 112);
+	// stage.addChild(circle);
+	// Ajout d'un antialiasing
+	let circleTexture = circle.generateTexture();
+	let circleSprite = new Sprite(circleTexture);
+	circleSprite.position.set(212, 64);
+	stage.addChild(circleSprite);
 
 	// Dessin d'une elipse
 	let elipse = new Graphics();

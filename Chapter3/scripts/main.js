@@ -40,7 +40,7 @@ let state = play;
 
 loader
 	.add("fonts/puzzler.ttf")
-	.load(setup)
+	.load(setupWithOneContext)
 
 function setup() {
 
@@ -124,7 +124,31 @@ function setup() {
 	gameLoop();
 }
 
+function setupWithOneContext() {
 
+	let ctx = new Graphics();
+
+	// Un rectangle dans le context
+	ctx.beginFill(0x0033CC);
+	ctx.lineStyle(4, 0xFF0000, 1);
+	ctx.drawRect(32, 32, 96, 96);
+	ctx.endFill();
+
+	// Un cercle toujours dans le même contexte
+	ctx.beginFill(0xFF9933);
+	ctx.lineStyle(0);
+	ctx.drawCircle(224, 80, 48);
+	ctx.endFill();
+
+	// Une ligne maintenant
+	ctx.lineStyle(4, 0xFFFFFF, 1);
+	ctx.moveTo(320, 48);
+	ctx.lineTo(420, 112);
+
+	stage.addChild(ctx);
+
+	gameLoop();
+}
 
 function gameLoop() {
 	// Loop this function 60 times per second

@@ -9,6 +9,8 @@ let Sprite = PIXI.Sprite;
 let Rectangle = PIXI.Rectangle;
 let Texture = PIXI.Texture;
 let Graphics = PIXI.Graphics;
+let Text = PIXI.Text;
+let BitmapText = PIXI.extras.BitmapText;
 
 ////////////////////////
 // Configuration PIXI //
@@ -37,10 +39,15 @@ let scale = scaleToWindow(renderer.view);
 // Code métier /////////////
 ////////////////////////////
 let state = play;
+let line;
 
 loader
 	.add("fonts/puzzler.ttf")
-	.load(setupWithOneContext)
+	.add("fonts/disko.xml")
+	.load(setupText)
+
+// Ajout de la font:
+	linkFont("fonts/puzzler.otf");
 
 function setup() {
 
@@ -150,6 +157,39 @@ function setupWithOneContext() {
 	gameLoop();
 }
 
+function setupText() {	
+
+	let message = new Text(
+		"Hello World ! Bacon ipsuem dorlor sit amert et very appreciate vrom the very finest set of connaisseurs of the world of the doom of the of of the very best !",
+		{font: "12px Impact", fill: "red", wordWrap: true, wordWrapWidth: 100}
+	);
+
+	let messageBitmap = new BitmapText(
+		"Hello World BIS !", 
+		{font: "48px disko"}
+	);
+
+	message.position.set(renderer.view.width / 2 - message.width / 2, renderer.view.height / 2 - message.height / 2);
+	messageBitmap.position.set(message.x - 150, message.y + 150);
+	// message.style = ({wordWrap: true, wordWrapWidth: 100});
+
+	stage.addChild(message);
+	stage.addChild(messageBitmap);
+
+	gameLoop();
+}
+
+
+function setupAnimation() {
+	line = new Graphics();
+	stage.addChild(line);
+
+	line.angleA = 0;
+	line.angleB = 0;
+
+	gameLoop();
+}
+
 function gameLoop() {
 	// Loop this function 60 times per second
 	requestAnimationFrame(gameLoop);
@@ -163,4 +203,40 @@ function gameLoop() {
 
 function play() {
 
+	// Play Animation
+	// line.angleA += 0.02;
+	// let rotatingA = rotateAroundPoint(64, 64, 20, 20, line.angleA);
+
+	// line.angleB -= 0.03;
+	// let rotatingB = rotateAroundPoint(192, 208, 20, 20, line.angleB);
+
+	// line.clear();
+
+	// line.lineStyle(4, 0xFFFFFF, 1);
+	// line.moveTo(rotatingA.x, rotatingA.y);
+	// line.lineTo(rotatingB.x, rotatingB.y);
+
+	// Play Text
+	
+
+}
+
+function rotateAroundPoint(pointX, pointY, distanceX, distanceY, angle) {
+	let point = {};
+	point.x = pointX + Math.cos(angle) * distanceX;
+	point.y = pointY + Math.sin(angle) * distanceY;
+	return point;
+}
+
+function linkFont(source) {
+
+	//Use the font's filename as the `fontFamily` name. This code captures
+	//the font file's name without the extension or file path
+	let fontFamily = source.split("/").pop().split(".")[0];
+
+	//Append an `@afont-face` style rule to the head of the HTML document
+	let newStyle = document.createElement("style");
+	let fontFace = "@font-face {font-family: '" + fontFamily + "'; src: url('" + source + "');}";
+	newStyle.appendChild(document.createTextNode(fontFace));
+	document.head.appendChild(newStyle);
 }

@@ -11,6 +11,8 @@ let Texture = PIXI.Texture;
 let Graphics = PIXI.Graphics;
 let Text = PIXI.Text;
 let BitmapText = PIXI.extras.BitmapText;
+let Container = PIXI.Container;
+let ParticleContainer = PIXI.ParticleContainer;
 
 ////////////////////////
 // Configuration PIXI //
@@ -44,7 +46,8 @@ let line;
 loader
 	.add("fonts/puzzler.ttf")
 	.add("fonts/disko.xml")
-	.load(setupText)
+	.add("images/animals.json")
+	.load(setupContainer)
 
 // Ajout de la font:
 	linkFont("fonts/puzzler.otf");
@@ -186,6 +189,48 @@ function setupAnimation() {
 
 	line.angleA = 0;
 	line.angleB = 0;
+
+	gameLoop();
+}
+
+function setupContainer() {
+	let cat, hedgehog, tiger;
+	let animals;
+	let id = loader.resources["images/animals.json"].textures;
+
+	// The cat
+	cat = new Sprite(id["cat.png"]);
+	cat.position.set(0,0);
+
+	// The hedgehog
+	hedgehog = new Sprite(id["hedgehog.png"]);
+	hedgehog.position.set(32, 32);
+
+	// The tiger
+	tiger = new Sprite(id["tiger.png"]);
+	tiger.position.set(64, 64);
+
+	// Création du container
+	animals = new Container();
+
+	animals.addChild(cat);
+	animals.addChild(hedgehog);
+	animals.addChild(tiger);
+
+	animals.width = 250;
+	animals.height = 250;
+
+	animals.position.set(96, 96);
+
+	console.log("TIGER LOCAL POSITION: ", tiger.position);
+	console.log("TIGER GLOBAL POSITION: ", animals.toGlobal(tiger.position).x, ":", animals.toGlobal(tiger.position).y);
+	console.log("CAT GLOBAL POSITION: ", cat.getGlobalPosition().x, ":", cat.getGlobalPosition().y);
+	console.log("Distance between Cat and Hedgehog: ", cat.toLocal(cat.position, hedgehog).x, ":", cat.toLocal(cat.position, hedgehog).y)
+
+	stage.addChild(animals);
+
+	// Utilisation d'un ParticleContainer
+	// let superFastSprites = new ParticleContainer();
 
 	gameLoop();
 }
